@@ -1,0 +1,141 @@
+<script lang="ts">
+	import * as L from 'leaflet';
+	import 'leaflet/dist/leaflet.css';
+	import type { DataEntry } from '../../../app';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import MapPopup from './MapPopup.svelte';
+	import marker_red from '$lib/images/marker-red.svg';
+	import marker_yellow from '$lib/images/marker-yellow.svg';
+	import marker_shadow from '$lib/images/marker-shadow.svg';
+	import marker_svg from '$lib/images/marker.svg';
+	import { dangerLevelByEntry } from './analysis';
+
+	let storedData = JSON.parse(localStorage.getItem('data') || '{}') as {
+		[key in string]: DataEntry[];
+	};
+	if (
+		storedData == null ||
+		storedData == undefined ||
+		!Object.hasOwn(storedData, $page.params.name)
+	) {
+		goto('/', { replaceState: true });
+		alert('Invalid map!');
+	}
+
+	let data = storedData[$page.params.name];
+
+	function centerDataPosition(): [number, number] {
+		let latitude_sum = data
+			.map((entry) => entry.latitude)
+			.reduce((partialSum, a) => partialSum + a, 0);
+		let longitude_sum = data
+			.map((entry) => entry.longitude)
+			.reduce((partialSum, a) => partialSum + a, 0);
+
+		return [latitude_sum / data.length, longitude_sum / data.length];
+	}
+
+	let map: L.Map;
+	const MARKER_RED_ICON = new L.Icon({
+		iconUrl: marker_red,
+		shadowUrl: marker_shadow,
+		iconSize:    [25, 41],
+		iconAnchor:  [12, 41],
+		popupAnchor: [1, -34],
+		tooltipAnchor: [16, -28],
+		shadowSize:  [41, 41]
+	});
+	const MARKER_YELLOW_ICON = new L.Icon({
+		iconUrl: marker_yellow,
+		shadowUrl: marker_shadow,
+		iconSize:    [25, 41],
+		iconAnchor:  [12, 41],
+		popupAnchor: [1, -34],
+		tooltipAnchor: [16, -28],
+		shadowSize:  [41, 41]
+	});
+	const MARKER_ICON = new L.Icon({
+		iconUrl: marker_svg,
+		shadowUrl: marker_shadow,
+		iconSize:    [25, 41],
+		iconAnchor:  [12, 41],
+		popupAnchor: [1, -34],
+		tooltipAnchor: [16, -28],
+		shadowSize:  [41, 41]
+	});
+
+	function bindPopup(marker: L.Marker<any>, createFn: any) {
+		let popupComponent: any;
+		marker.bindPopup(
+			() => {
+				let container = L.DomUtil.create('div');
+				popupComponent = createFn(container);
+				return container;
+			},
+			{
+				maxWidth: window.innerWidth / 2
+			}
+		);
+
+		marker.on('popupclose', () => {
+			if (popupComponent) {
+				let old = popupComponent;
+				popupComponent = null;
+				// Wait for the popup to completely fade out before destroying it.
+				// Otherwise the fade out looks weird as the contents disappear too early.
+				setTimeout(() => {
+					old.$destroy();
+				}, 500);
+			}
+		});
+	}
+
+	function createMap(container: HTMLElement) {
+		let m = L.map(container).setView(centerDataPosition(), 13);
+		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: `&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`,
+			minZoom: 10,
+			maxZoom: 19
+		}).addTo(m);
+
+		for (const entry of data) {
+			let icon = {0: MARKER_ICON, 1: MARKER_YELLOW_ICON, 2: MARKER_RED_ICON}[dangerLevelByEntry(entry)];
+			let marker = L.marker([entry.latitude, entry.longitude], { icon }).addTo(m);
+			bindPopup(marker, (markerContainer: HTMLElement) => {
+				let component = new MapPopup({
+					target: markerContainer,
+					props: {
+						data: entry
+					}
+				});
+				return component;
+			});
+		}
+
+		return m;
+	}
+
+	function mapAction(container: HTMLElement) {
+		map = createMap(container);
+		return {
+			destroy: () => {
+				map.remove();
+			}
+		};
+	}
+
+	function resizeMap() {
+		if (map) {
+			map.invalidateSize();
+		}
+	}
+</script>
+
+<svelte:window on:resize={resizeMap} />
+<section style="height:100%">
+	<div style="width:99vw;height:100%;margin-top: 1vh;" use:mapAction />
+</section>
+
+<style>
+</style>
