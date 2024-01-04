@@ -10,6 +10,10 @@
 	import marker_shadow from '$lib/images/marker-shadow.svg';
 	import marker_svg from '$lib/images/marker.svg';
 	import { dangerLevelByEntry } from './analysis';
+	import type { PageData } from './$types';
+	import { parseData } from '../../parser';
+
+	export let data: PageData;
 
 	let storedData = JSON.parse(localStorage.getItem('data') || '{}') as {
 		[key in string]: DataEntry[];
@@ -19,21 +23,29 @@
 		storedData == undefined ||
 		!Object.hasOwn(storedData, $page.params.name)
 	) {
-		goto('/', { replaceState: true });
-		alert('Invalid map!');
+		if(data.data != undefined) {
+			let entries = parseData(Uint8Array.from(atob(data.data), c => c.charCodeAt(0)).buffer);
+			console.log(entries);
+			storedData[$page.params.name] = entries;
+			localStorage.setItem("data", JSON.stringify(storedData));
+		} else {
+			goto('/', { replaceState: true });
+			setTimeout(() => {alert('Invalid map!');}, 200)
+		}
 	}
 
-	let data = storedData[$page.params.name];
+
+	let dataEntries = storedData[$page.params.name];
 
 	function centerDataPosition(): [number, number] {
-		let latitude_sum = data
+		let latitude_sum = dataEntries
 			.map((entry) => entry.latitude)
 			.reduce((partialSum, a) => partialSum + a, 0);
-		let longitude_sum = data
+		let longitude_sum = dataEntries
 			.map((entry) => entry.longitude)
 			.reduce((partialSum, a) => partialSum + a, 0);
 
-		return [latitude_sum / data.length, longitude_sum / data.length];
+		return [latitude_sum / dataEntries.length, longitude_sum / dataEntries.length];
 	}
 
 	let map: L.Map;
@@ -99,7 +111,7 @@
 			maxZoom: 19
 		}).addTo(m);
 
-		for (const entry of data) {
+		for (const entry of dataEntries) {
 			let icon = {0: MARKER_ICON, 1: MARKER_YELLOW_ICON, 2: MARKER_RED_ICON}[dangerLevelByEntry(entry)];
 			let marker = L.marker([entry.latitude, entry.longitude], { icon }).addTo(m);
 			bindPopup(marker, (markerContainer: HTMLElement) => {
