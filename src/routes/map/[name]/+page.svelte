@@ -104,16 +104,12 @@
 	}
 
 	function createMap(container: HTMLElement) {
-		let m = L.map(container).setView(centerDataPosition(), 13);
-		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: `&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`,
-			minZoom: 10,
-			maxZoom: 19
-		}).addTo(m);
+		let markersByDangerLevel: {[key in 0 | 1 | 2]: Array<L.Marker>} = {0: [], 1: [], 2: []};
 
 		for (const entry of dataEntries) {
 			let icon = {0: MARKER_ICON, 1: MARKER_YELLOW_ICON, 2: MARKER_RED_ICON}[dangerLevelByEntry(entry)];
-			let marker = L.marker([entry.latitude, entry.longitude], { icon }).addTo(m);
+			let marker = L.marker([entry.latitude, entry.longitude], { icon });
+			markersByDangerLevel[dangerLevelByEntry(entry)].push(marker);
 			bindPopup(marker, (markerContainer: HTMLElement) => {
 				let component = new MapPopup({
 					target: markerContainer,
@@ -124,6 +120,31 @@
 				return component;
 			});
 		}
+
+		
+
+		let dangerLowLayerGroup = L.layerGroup(markersByDangerLevel[0]);
+		let dangerMediumLayerGroup = L.layerGroup(markersByDangerLevel[1]);
+		let dangerHighLayerGroup = L.layerGroup(markersByDangerLevel[2]);
+
+		let m = L.map(container, {
+			layers: [dangerLowLayerGroup, dangerMediumLayerGroup, dangerHighLayerGroup]
+		}).setView(centerDataPosition(), 13);
+
+		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: `&#169; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`,
+			minZoom: 10,
+			maxZoom: 19
+		}).addTo(m);
+
+		L.control.layers(
+			undefined, {
+				[`<img src="${marker_svg}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`]: dangerLowLayerGroup,
+				[`<img src="${marker_yellow}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Mittlere gemessene Gefahr`]: dangerMediumLayerGroup,
+				[`<img src="${marker_red}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Hohe gemessene Gefahr`]: dangerHighLayerGroup
+			}, undefined
+			).addTo(m);
+
 
 		return m;
 	}
@@ -145,9 +166,8 @@
 </script>
 
 <svelte:window on:resize={resizeMap} />
-<section style="height:100%">
-	<div style="width:98vw;height:100%;margin-left: 1vw" use:mapAction />
-</section>
+
+<div id="map" style="width:98vw;height:100%;margin-left: 1vw" use:mapAction />
 
 <style>
 </style>
