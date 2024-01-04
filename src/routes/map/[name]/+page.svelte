@@ -86,7 +86,7 @@
 				return container;
 			},
 			{
-				maxWidth: window.innerWidth / 2
+				maxWidth: window.innerWidth / 3
 			}
 		);
 
@@ -146,7 +146,7 @@
 
 <svelte:window on:resize={resizeMap} />
 <section style="height:100%">
-	<div style="width:99vw;height:100%;margin-top: 1vh;" use:mapAction />
+	<div style="width:98vw;height:100%;margin-left: 1vw" use:mapAction />
 </section>
 
 <style>

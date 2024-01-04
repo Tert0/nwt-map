@@ -1,6 +1,6 @@
 import type { DataEntry } from "../../../app";
 
-export function dangerLevelByDistance(distance: number): number {
+export function dangerLevelByDistance(distance: number): 0 | 1 | 2 {
     if(distance < 500) {
         return 2;
     }
@@ -10,6 +10,6 @@ export function dangerLevelByDistance(distance: number): number {
     return 0;
 }
 
-export function dangerLevelByEntry(entry: DataEntry): number {
-    return Math.max(...[entry.distance1, entry.distance2, entry.distance3].map(dangerLevelByDistance));
+export function dangerLevelByEntry(entry: DataEntry): 0 | 1 | 2 {
+    return Math.max(...[entry.distance1, entry.distance2, entry.distance3].map(dangerLevelByDistance)) as (0 | 1 | 2);
 }
