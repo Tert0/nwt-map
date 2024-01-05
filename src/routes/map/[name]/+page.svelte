@@ -23,17 +23,18 @@
 		storedData == undefined ||
 		!Object.hasOwn(storedData, $page.params.name)
 	) {
-		if(data.data != undefined) {
-			let entries = parseData(Uint8Array.from(atob(data.data), c => c.charCodeAt(0)).buffer);
+		if (data.data != undefined) {
+			let entries = parseData(Uint8Array.from(atob(data.data), (c) => c.charCodeAt(0)).buffer);
 			console.log(entries);
 			storedData[$page.params.name] = entries;
-			localStorage.setItem("data", JSON.stringify(storedData));
+			localStorage.setItem('data', JSON.stringify(storedData));
 		} else {
 			goto('/', { replaceState: true });
-			setTimeout(() => {alert('Invalid map!');}, 200)
+			setTimeout(() => {
+				alert('Invalid map!');
+			}, 200);
 		}
 	}
-
 
 	let dataEntries = storedData[$page.params.name];
 
@@ -52,33 +53,33 @@
 	const MARKER_RED_ICON = new L.Icon({
 		iconUrl: marker_red,
 		shadowUrl: marker_shadow,
-		iconSize:    [25, 41],
-		iconAnchor:  [12, 41],
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
 		popupAnchor: [1, -34],
 		tooltipAnchor: [16, -28],
-		shadowSize:  [41, 41]
+		shadowSize: [41, 41]
 	});
 	const MARKER_YELLOW_ICON = new L.Icon({
 		iconUrl: marker_yellow,
 		shadowUrl: marker_shadow,
-		iconSize:    [25, 41],
-		iconAnchor:  [12, 41],
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
 		popupAnchor: [1, -34],
 		tooltipAnchor: [16, -28],
-		shadowSize:  [41, 41]
+		shadowSize: [41, 41]
 	});
 	const MARKER_ICON = new L.Icon({
 		iconUrl: marker_svg,
 		shadowUrl: marker_shadow,
-		iconSize:    [25, 41],
-		iconAnchor:  [12, 41],
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
 		popupAnchor: [1, -34],
 		tooltipAnchor: [16, -28],
-		shadowSize:  [41, 41]
+		shadowSize: [41, 41]
 	});
 
-	function bindPopup(marker: L.Marker<any>, createFn: any) {
-		let popupComponent: any;
+	function bindPopup(marker: L.Marker, createFn: (container: HTMLElement) => MapPopup) {
+		let popupComponent: MapPopup | null;
 		marker.bindPopup(
 			() => {
 				let container = L.DomUtil.create('div');
@@ -86,7 +87,7 @@
 				return container;
 			},
 			{
-				maxWidth: window.innerWidth / 3
+				maxWidth: window.innerWidth / 2 // TODO: this leads to issues when the size changes after the page load (e.g. rotating mobile device)
 			}
 		);
 
@@ -104,10 +105,12 @@
 	}
 
 	function createMap(container: HTMLElement) {
-		let markersByDangerLevel: {[key in 0 | 1 | 2]: Array<L.Marker>} = {0: [], 1: [], 2: []};
+		let markersByDangerLevel: { [key in 0 | 1 | 2]: Array<L.Marker> } = { 0: [], 1: [], 2: [] };
 
 		for (const entry of dataEntries) {
-			let icon = {0: MARKER_ICON, 1: MARKER_YELLOW_ICON, 2: MARKER_RED_ICON}[dangerLevelByEntry(entry)];
+			let icon = { 0: MARKER_ICON, 1: MARKER_YELLOW_ICON, 2: MARKER_RED_ICON }[
+				dangerLevelByEntry(entry)
+			];
 			let marker = L.marker([entry.latitude, entry.longitude], { icon });
 			markersByDangerLevel[dangerLevelByEntry(entry)].push(marker);
 			bindPopup(marker, (markerContainer: HTMLElement) => {
@@ -120,8 +123,6 @@
 				return component;
 			});
 		}
-
-		
 
 		let dangerLowLayerGroup = L.layerGroup(markersByDangerLevel[0]);
 		let dangerMediumLayerGroup = L.layerGroup(markersByDangerLevel[1]);
@@ -137,14 +138,20 @@
 			maxZoom: 19
 		}).addTo(m);
 
-		L.control.layers(
-			undefined, {
-				[`<img src="${marker_svg}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`]: dangerLowLayerGroup,
-				[`<img src="${marker_yellow}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Mittlere gemessene Gefahr`]: dangerMediumLayerGroup,
-				[`<img src="${marker_red}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Hohe gemessene Gefahr`]: dangerHighLayerGroup
-			}, undefined
-			).addTo(m);
-
+		L.control
+			.layers(
+				undefined,
+				{
+					[`<img src="${marker_svg}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`]:
+						dangerLowLayerGroup,
+					[`<img src="${marker_yellow}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Mittlere gemessene Gefahr`]:
+						dangerMediumLayerGroup,
+					[`<img src="${marker_red}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Hohe gemessene Gefahr`]:
+						dangerHighLayerGroup
+				},
+				undefined
+			)
+			.addTo(m);
 
 		return m;
 	}

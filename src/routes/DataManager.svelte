@@ -13,7 +13,7 @@
 		if (target.files?.length == 1) {
 			let file: File = target.files[0];
 			let raw = await file.arrayBuffer();
-			
+
 			data.update((d) => {
 				let k = file.name;
 				return { ...d, [k]: parseData(raw) };

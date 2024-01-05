@@ -9,7 +9,12 @@
 	</main>
 
 	<footer>
-		<span>Weitere Informationen, Quellcode und Lizenzen: <a class="githubLogo" href="https://github.com/Tert0/nwt-map"><img src={github_logo} alt="Github Logo"/>Github</a></span>
+		<span
+			>Weitere Informationen, Quellcode und Lizenzen: <a
+				class="githubLogo"
+				href="https://github.com/Tert0/nwt-map"><img src={github_logo} alt="Github Logo" />Github</a
+			></span
+		>
 	</footer>
 </div>
 

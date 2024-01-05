@@ -1,5 +1,5 @@
 <script>
-	import DataManager from "./DataManager.svelte";
+	import DataManager from './DataManager.svelte';
 </script>
 
 <svelte:head>
@@ -8,9 +8,7 @@
 </svelte:head>
 
 <section>
-	<h1>
-		Measured Data
-	</h1>
+	<h1>Measured Data</h1>
 
 	<DataManager />
 </section>
