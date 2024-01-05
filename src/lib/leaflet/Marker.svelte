@@ -1,10 +1,10 @@
 <script lang="ts">
 	import * as L from 'leaflet';
 	import { getContext, onDestroy, setContext } from 'svelte';
-	import { MARKER_ICON } from './icons';
+	import { MARKER_BLUE_ICON } from './icons';
 
 	export let latLng: L.LatLngExpression;
-	export let icon: L.Icon = MARKER_ICON;
+	export let icon: L.Icon = MARKER_BLUE_ICON;
 
 	let layerGroup = getContext<() => L.LayerGroup>('layerGroup')();
 	let marker = new L.Marker(latLng, { icon }).addTo(layerGroup);

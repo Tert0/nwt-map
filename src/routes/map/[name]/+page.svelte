@@ -13,10 +13,10 @@
 	import Marker from '$lib/leaflet/Marker.svelte';
 	import Popup from '$lib/leaflet/Popup.svelte';
 	import {
-		MARKER_ICON,
+		MARKER_BLUE_ICON,
 		MARKER_ICON_SVGS,
 		MARKER_RED_ICON,
-		MARKER_YELLOW_ICON
+		MARKER_ORANGE_ICON
 	} from '$lib/leaflet/icons';
 	import Legend from '$lib/leaflet/Legend.svelte';
 
@@ -88,7 +88,7 @@
 		name={`<img src="${MARKER_ICON_SVGS[0]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`}
 	>
 		{#each entriesByDangerLevel[0] as entry}
-			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_ICON}>
+			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_BLUE_ICON}>
 				<Popup>
 					<DataEntryPopupContent data={entry} />
 				</Popup>
@@ -99,7 +99,7 @@
 		name={`<img src="${MARKER_ICON_SVGS[1]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Mittlere gemessene Gefahr`}
 	>
 		{#each entriesByDangerLevel[1] as entry}
-			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_YELLOW_ICON}>
+			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_ORANGE_ICON}>
 				<Popup>
 					<DataEntryPopupContent data={entry} />
 				</Popup>
