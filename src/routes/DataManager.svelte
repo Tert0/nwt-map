@@ -8,16 +8,32 @@
 		? writable({})
 		: writable(JSON.parse(localStorage.getItem('data') || '{}'));
 
-	async function upload_file(e: Event) {
+	let selectedFile: File | undefined;
+	let uploadName = '';
+
+	async function upload_file() {
+		if (selectedFile != undefined) {
+			let file: File = selectedFile;
+			if (file.type == 'application/json') {
+				let content = await file.text();
+				data.update((d) => {
+					return { ...d, [uploadName]: JSON.parse(content) };
+				});
+			} else {
+				let raw = await file.arrayBuffer();
+
+				data.update((d) => {
+					return { ...d, [uploadName]: parseData(raw) };
+				});
+			}
+		}
+	}
+
+	function selected_file(e: Event) {
 		let target: HTMLInputElement = e.target as HTMLInputElement;
 		if (target.files?.length == 1) {
-			let file: File = target.files[0];
-			let raw = await file.arrayBuffer();
-
-			data.update((d) => {
-				let k = file.name;
-				return { ...d, [k]: parseData(raw) };
-			});
+			selectedFile = target.files[0];
+			uploadName = selectedFile.name.replace(/\.json$/, '');
 		}
 	}
 
@@ -43,10 +59,22 @@
 						}}>Delete</button
 					>
 					<a href="/map/{key}"><button>Map</button></a>
+					<a
+						href={URL.createObjectURL(
+							new Blob([JSON.stringify(value)], { type: 'application/json' })
+						)}
+						download="data.json"><button>Download (JSON)</button></a
+					>
 				</li>
 			{/each}
 		</ul>
 	{/if}
 	<br />
-	<input type="file" accept="DATA" on:change={upload_file} />
+	<label for="upload_name">Dataset Name:</label>
+	<input name="upload_name" type="text" bind:value={uploadName} disabled={!selectedFile} />
+	<input type="file" accept="data,*.json" on:change={selected_file} />
+	<button disabled={!selectedFile || uploadName == ''} on:click={upload_file}>Upload</button>
+	{#if uploadName in $data}
+		<span style="color: red;">WARNING: Overriding dataset!</span>
+	{/if}
 </div>

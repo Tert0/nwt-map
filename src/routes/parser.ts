@@ -14,7 +14,12 @@ function validate_checksum(entry_raw: ArrayBuffer): boolean {
 export function parseData(raw: ArrayBuffer): Array<DataEntry> {
 	const entries_cnt = Math.trunc(raw.byteLength / ENTRY_SIZE);
 	if (raw.byteLength % ENTRY_SIZE != 0) {
-		alert(`Data length is correct. (Got: ${raw.byteLength} Expected: Block Size of ${ENTRY_SIZE})`);
+		alert(
+			`Data length is not correct. (Got: ${raw.byteLength} Expected: Block Size of ${ENTRY_SIZE})`
+		);
+		throw Error(
+			`Data length invalid. (Got: ${raw.byteLength} Expected: Block Size of ${ENTRY_SIZE})`
+		);
 	}
 
 	const entries = [];

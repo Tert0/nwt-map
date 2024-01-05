@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as L from 'leaflet';
 	import { getContext } from 'svelte';
+	import { writable } from 'svelte/store';
 	class Legend extends L.Control {
 		node: HTMLElement;
 
@@ -30,7 +31,11 @@
 		};
 	}
 
-	let open = true;
+	let open = writable((localStorage.getItem('legendOpen') || 'true') == 'true');
+
+	open.subscribe((value) => {
+		localStorage.setItem('legendOpen', JSON.stringify(value));
+	});
 
 	const map = getContext<() => L.Map>('map')();
 </script>
@@ -38,7 +43,7 @@
 <div use:createLegend>
 	<div class="legend {open ? 'open' : 'close'}">
 		{#if legend}
-			{#if open}
+			{#if $open}
 				<h3>Legende</h3>
 				<slot />
 				<br />
@@ -49,8 +54,8 @@
 				role="button"
 				tabindex={0}
 				on:click={() => {
-					open = !open;
-				}}>{open ? '[Einklappen]' : '[Ausklappen]'}</span
+					$open = !$open;
+				}}>{$open ? '[Einklappen]' : '[Ausklappen]'}</span
 			>
 		{/if}
 	</div>
