@@ -26,8 +26,7 @@
 	}
 
 	main {
-		margin-top: 1vh;
-		height: 98%;
+		height: 99%;
 		box-sizing: border-box;
 	}
 
