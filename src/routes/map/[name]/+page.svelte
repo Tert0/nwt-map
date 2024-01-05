@@ -12,7 +12,12 @@
 	import LayerGroup from '$lib/leaflet/LayerGroup.svelte';
 	import Marker from '$lib/leaflet/Marker.svelte';
 	import Popup from '$lib/leaflet/Popup.svelte';
-	import { MARKER_ICON, MARKER_ICON_SVGS, MARKER_RED_ICON, MARKER_YELLOW_ICON } from '$lib/leaflet/icons';
+	import {
+		MARKER_ICON,
+		MARKER_ICON_SVGS,
+		MARKER_RED_ICON,
+		MARKER_YELLOW_ICON
+	} from '$lib/leaflet/icons';
 
 	export let data: PageData;
 
@@ -40,12 +45,14 @@
 	let dataEntries = storedData[$page.params.name];
 
 	function dataBounds() {
-        let latitude_min = Math.min(...dataEntries.map(entry => entry.latitude));
-        let latitude_max = Math.max(...dataEntries.map(entry => entry.latitude));
-        let longitude_min = Math.min(...dataEntries.map(entry => entry.longitude));
-        let longitude_max = Math.max(...dataEntries.map(entry => entry.longitude));
-        return new L.LatLngBounds([latitude_min, longitude_min], [latitude_max, longitude_max]).pad(0.05);
-    }
+		let latitude_min = Math.min(...dataEntries.map((entry) => entry.latitude));
+		let latitude_max = Math.max(...dataEntries.map((entry) => entry.latitude));
+		let longitude_min = Math.min(...dataEntries.map((entry) => entry.longitude));
+		let longitude_max = Math.max(...dataEntries.map((entry) => entry.longitude));
+		return new L.LatLngBounds([latitude_min, longitude_min], [latitude_max, longitude_max]).pad(
+			0.05
+		);
+	}
 
 	let entriesByDangerLevel: { [key in 0 | 1 | 2]: Array<DataEntry> } = { 0: [], 1: [], 2: [] };
 
@@ -55,31 +62,37 @@
 </script>
 
 <Leaflet bounds={dataBounds()}>
-    <LayerGroup name={`<img src="${MARKER_ICON_SVGS[0]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`}>
-        { #each entriesByDangerLevel[0] as entry }
-            <Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_ICON}>
-                <Popup>
-                    <DataEntryPopupContent data={entry}/>
-                </Popup>
-            </Marker>
-        {/each}
-    </LayerGroup>
-    <LayerGroup name={`<img src="${MARKER_ICON_SVGS[1]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Mittlere gemessene Gefahr`}>
-        { #each entriesByDangerLevel[1] as entry }
-            <Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_YELLOW_ICON}>
-                <Popup>
-                    <DataEntryPopupContent data={entry}/>
-                </Popup>
-            </Marker>
-        {/each}
-    </LayerGroup>
-    <LayerGroup name={`<img src="${MARKER_ICON_SVGS[2]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Hohe gemessene Gefahr`}>
-        { #each entriesByDangerLevel[2] as entry }
-            <Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_RED_ICON}>
-                <Popup>
-                    <DataEntryPopupContent data={entry}/>
-                </Popup>
-            </Marker>
-        {/each}
-    </LayerGroup>
+	<LayerGroup
+		name={`<img src="${MARKER_ICON_SVGS[0]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`}
+	>
+		{#each entriesByDangerLevel[0] as entry}
+			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_ICON}>
+				<Popup>
+					<DataEntryPopupContent data={entry} />
+				</Popup>
+			</Marker>
+		{/each}
+	</LayerGroup>
+	<LayerGroup
+		name={`<img src="${MARKER_ICON_SVGS[1]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Mittlere gemessene Gefahr`}
+	>
+		{#each entriesByDangerLevel[1] as entry}
+			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_YELLOW_ICON}>
+				<Popup>
+					<DataEntryPopupContent data={entry} />
+				</Popup>
+			</Marker>
+		{/each}
+	</LayerGroup>
+	<LayerGroup
+		name={`<img src="${MARKER_ICON_SVGS[2]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Hohe gemessene Gefahr`}
+	>
+		{#each entriesByDangerLevel[2] as entry}
+			<Marker latLng={[entry.latitude, entry.longitude]} icon={MARKER_RED_ICON}>
+				<Popup>
+					<DataEntryPopupContent data={entry} />
+				</Popup>
+			</Marker>
+		{/each}
+	</LayerGroup>
 </Leaflet>

@@ -7,7 +7,7 @@
 	export let width = '100%';
 	export let defaultView: L.LatLngExpression | undefined = undefined;
 	export let defaultZoom: number | undefined = undefined;
-    export let bounds: L.LatLngBounds | undefined = undefined;
+	export let bounds: L.LatLngBounds | undefined = undefined;
 
 	let map: L.Map | undefined;
 	let controlLayers: L.Control.Layers | undefined;
@@ -18,12 +18,12 @@
 	setContext('controlLayers', () => controlLayers);
 
 	function createLeaflet(node: HTMLElement) {
-		map = L.map(node, {zoomSnap: 0.5});
-        if(bounds) {
-            map?.fitBounds(bounds);
-        } else if(defaultView) {
-            map.setView(defaultView, defaultZoom || 1);
-        }
+		map = L.map(node, { zoomSnap: 0.5 });
+		if (bounds) {
+			map?.fitBounds(bounds);
+		} else if (defaultView) {
+			map.setView(defaultView, defaultZoom || 1);
+		}
 		controlLayers = new L.Control.Layers();
 		controlLayers.addTo(map);
 

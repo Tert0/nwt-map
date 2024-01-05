@@ -32,7 +32,6 @@ export const MARKER_ICON = new L.Icon({
 	shadowSize: [41, 41]
 });
 
-
 export const MARKER_ICON_SVGS = {
 	0: marker_svg,
 	1: marker_yellow,
