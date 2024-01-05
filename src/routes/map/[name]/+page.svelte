@@ -18,6 +18,7 @@
 		MARKER_RED_ICON,
 		MARKER_YELLOW_ICON
 	} from '$lib/leaflet/icons';
+	import Legend from '$lib/leaflet/Legend.svelte';
 
 	export let data: PageData;
 
@@ -62,6 +63,27 @@
 </script>
 
 <Leaflet bounds={dataBounds()}>
+	<Legend>
+		<img
+			src={MARKER_ICON_SVGS[0]}
+			style="width: 1em;height: 1em;vertical-align: text-top;"
+			alt="Low Danger Marker"
+		/>
+		Geringe gemessene Gefahr
+		<br />
+		<img
+			src={MARKER_ICON_SVGS[1]}
+			style="width: 1em;height: 1em;vertical-align: text-top;"
+			alt="Medium Danger Marker"
+		/>
+		Mittlere gemessene Gefahr
+		<br />
+		<img
+			src={MARKER_ICON_SVGS[2]}
+			style="width: 1em;height: 1em;vertical-align: text-top;"
+			alt="High Danger Marker"
+		/> Hohe gemessene Gefahr
+	</Legend>
 	<LayerGroup
 		name={`<img src="${MARKER_ICON_SVGS[0]}" style="width: 1em;height: 1em;vertical-align: text-top;"/> Geringe gemessene Gefahr`}
 	>

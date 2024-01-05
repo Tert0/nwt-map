@@ -9,7 +9,7 @@
 
 	let layerGroup: L.LayerGroup | undefined = L.layerGroup();
 
-	controlLayers.addOverlay(layerGroup, name);
+	controlLayers.addOverlay(layerGroup, `<span style="user-select: none;">${name}</span>`);
 	map.addLayer(layerGroup);
 
 	setContext('layerGroup', () => layerGroup);
