@@ -2,7 +2,7 @@
 	import * as L from 'leaflet';
 	import type { DataEntry } from '../../../app';
 	import { dangerLevelByDistance } from './analysis';
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 
 	let copied = false;
 
@@ -50,7 +50,9 @@
 		</tbody>
 	</table>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<span role="button" tabindex="0" class="copy-button" class:copied={copied} on:click={copyPosition}>[Position kopieren]</span>
+	<span role="button" tabindex="0" class="copy-button" class:copied on:click={copyPosition}
+		>[Position kopieren]</span
+	>
 </section>
 
 <style>
@@ -68,7 +70,8 @@
 		user-select: none;
 		color: #094ebd;
 	}
-	.copy-button:active, .copied {
+	.copy-button:active,
+	.copied {
 		color: #05275f;
 	}
 
