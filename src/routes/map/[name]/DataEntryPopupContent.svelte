@@ -1,6 +1,21 @@
 <script lang="ts">
+	import * as L from 'leaflet';
 	import type { DataEntry } from '../../../app';
 	import { dangerLevelByDistance } from './analysis';
+	import { getContext, onMount } from 'svelte';
+
+	let copied = false;
+
+	// Workaround to reset copied after the popup closed because this Component is not destroyed on close (TODO)
+	const layer = getContext<() => L.Layer>('layer')();
+	layer.on('popupclose', () => {
+		copied = false;
+	});
+
+	function copyPosition() {
+		navigator.clipboard.writeText(`${data.latitude.toFixed(7)},${data.longitude}`);
+		copied = true;
+	}
 
 	export let data: DataEntry;
 
@@ -34,6 +49,8 @@
 			</tr>
 		</tbody>
 	</table>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<span role="button" tabindex="0" class="copy-button" class:copied={copied} on:click={copyPosition}>[Position kopieren]</span>
 </section>
 
 <style>
@@ -45,5 +62,17 @@
 	}
 	.dangerHigh {
 		color: red;
+	}
+
+	.copy-button {
+		user-select: none;
+		color: #094ebd;
+	}
+	.copy-button:active, .copied {
+		color: #05275f;
+	}
+
+	.copy-button:hover {
+		text-decoration: underline;
 	}
 </style>
